@@ -4,13 +4,13 @@ import os
 import tempfile
 
 # Define output directory (Change this to your actual output folder)
-OUTPUT_DIR = r"D:\psl299\segmentation model interface\output"
+OUTPUT_DIR = r"D:\Chris\Rabbit data\3D Slicer"
 
 # Ensure the output directory exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Path to the nnUNet prediction script
-SCRIPT_PATH = r"D:\psl299\segmentation model interface\rabbit_nnUNet_seg_pipeline\rabbit_nnUNet_seg_pipeline\nnunet_pred_nii.py"
+SCRIPT_PATH = r"D:\Chris\3D-nnUnet development\rabbit_nnUNet_seg_pipeline\rabbit_nnUNet_seg_pipeline\nnunet_pred_nii.py"
 
 def run_segmentation(input_path):
     """Runs the nnUNet segmentation model on the given input file."""
