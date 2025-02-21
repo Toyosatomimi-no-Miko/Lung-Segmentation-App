@@ -1,7 +1,6 @@
 import streamlit as st
-import subprocess
 import os
-import tempfile
+import subprocess
 
 # Define output directory (Change this to your actual output folder)
 OUTPUT_DIR = r"D:\Chris\Rabbit data\3D Slicer"
@@ -21,9 +20,10 @@ def run_segmentation(input_path):
     ]
 
     try:
-        subprocess.run(command, check=True)
+        subprocess.run(command, check=True, shell=True)
         return True
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        st.error(f"Error: {e}")
         return False
 
 def main():
@@ -36,27 +36,31 @@ def main():
         accept_multiple_files=True
     )
 
-    # Store temporary file paths
-    temp_file_paths = []
+    # Store input file paths
+    input_paths = []
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[-1]) as tmp_file:
-                tmp_file.write(uploaded_file.getbuffer())
-                temp_file_paths.append(tmp_file.name)
+            # Save file in OUTPUT_DIR to preserve name
+            input_path = os.path.join(OUTPUT_DIR, uploaded_file.name)
+
+            with open(input_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            input_paths.append(input_path)
 
         # Single button to run segmentation on all files
         if st.button("Run Segmentation on All Files"):
             with st.spinner("Processing images..."):
-                for input_path, uploaded_file in zip(temp_file_paths, uploaded_files):
+                for input_path in input_paths:
                     success = run_segmentation(input_path)
 
                     if success:
-                        st.success(f"✅ Segmentation completed for {uploaded_file.name}!")
+                        st.success(f"✅ Segmentation completed for {os.path.basename(input_path)}!")
                     else:
-                        st.error(f"❌ Segmentation failed for {uploaded_file.name}. Please check logs.")
+                        st.error(f"❌ Segmentation failed for {os.path.basename(input_path)}. Check logs.")
 
-            st.write(f"📂 All results are saved in: {OUTPUT_DIR}")
+            st.write(f"📂 All results are saved in: `{OUTPUT_DIR}`")
 
 if __name__ == "__main__":
     main()
